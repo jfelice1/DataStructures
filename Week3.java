@@ -16,7 +16,7 @@ public class Main {
     else
       System.out.println("best-case input unmatched");   
 
-    String worstCase = "BCDEFGHIJKLMNOPQRSTUVWXYZA0123456789";
+    String worstCase = "BCDEFGHIJKLMNOPQRSTUVWXYZA1234567809";
     
     // * Initialize startTime here
     long worstStartTime = System.nanoTime();
