@@ -10,7 +10,7 @@ public class Main {
     // * Initialize endTime here
     long bestEndTime = System.nanoTime();
     // * Calculate elapsedTime here
-    long elapsedTime = bestEndTime - bestStartTime;
+    long bestElapsedTime = bestEndTime - bestStartTime;
     if (index >= 0)
       System.out.println("best-case input matched at index " + index);
     else
@@ -24,7 +24,7 @@ public class Main {
     // * Initialize endTime here
     long worstEndTime = System.nanoTime();
     // * Calculate elapsedTime here
-    int elapsedTime = worstEndTime - worstStartTime;
+    int worstElapsedTime = worstEndTime - worstStartTime;
     if (index >= 0)
       System.out.println("worst-case input matched at index " + index);
     else
