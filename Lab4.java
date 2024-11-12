@@ -87,4 +87,4 @@ class Lab4 {
 /* Questions
 1. Insertion sort since I understand it best right now. 
 2. There was a difference. It took bubble more time to run which makes since. Bubble is a more complex algorithm and has more swaps to do.
-3. I hade an easier time with the insertion algorithm.
+3. I hade an easier time with the insertion algorithm. */
