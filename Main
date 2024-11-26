@@ -1,0 +1,172 @@
+class Main {
+  public static void main(String[] args) {
+
+    // Step 1 - Create a BST tree object called lab5Tree
+     Lab5Tree tree = new Lab5Tree();
+    // Step 2 - Insert the following values: 13, 22, 36, 5, 48, 17, 39, 2, 26, 40, 29, 34, 10
+     tree.insert(13);
+     tree.insert(22);
+     tree.insert(36);
+     tree.insert(5);
+     tree.insert(48);
+     tree.insert(17);
+     tree.insert(39);
+     tree.insert(2);
+     tree.insert(26);
+     tree.insert(40);
+     tree.insert(29);
+     tree.insert(34);
+     tree.insert(10);
+    // Step 3 - Delete the value 17
+     tree.delete(17);
+    // Step 4 - Traverse and output the values using inorder (sorted)
+     System.out.println("Inorder traversal: " + tree.inorder());
+    // Step 5 - Traverse and output the values using postorder
+     System.out.println("Postorder traversal: " + tree.postorder());
+    // Step 6 - Traverse and output the values using preorder
+     System.out.println("Preorder traversal: " + tree.preorder());
+    // Step 7 - Display the result of a search for the value 36
+    int searchKey = 36;
+    System.out.println("Search value 36: " + tree.search(searchKey));
+    // Step 8 - Display the result of a search for the value 37
+    int searchKey = 37;
+    System.out.println("Search value 37: " + tree.search(searchKey));
+    // Step 9 - Using the path() method, display the path from the root to 2
+    System.out.println("Path to 2: " + path(root, new ArrayList<Integer>(), 2));
+    // Step 10 - Display the path from the root to 34
+    System.out.println("Path to 34: " + path(root, new ArrayList<Integer>(), 34));
+  }
+}
+
+class Node {
+    int key;
+    Node left, right;
+
+    public Node(int item) {
+      key = item;
+      left = right = null;
+    }
+   }
+   class Lab5Tree {
+    Node root;
+
+    public Lab5Tree() {
+      root = null;
+    }
+    
+    void insert(int key) {
+      root = insertRec(root, key);
+    }
+
+    Node insertRec(Node root, int key) {
+      if(root == null) {
+        root = new Node(key);
+        return root;
+      }
+      if(key < root.key) {
+        root.left = insertRec(root.left, key);
+      } 
+      else if(key > root.key) {
+        root.right = insertRec(root.right, key);
+      }
+      return root;
+    }
+
+    void delete(int key) {
+      if (root == null)
+            return root;
+
+        if (key < root.key)
+            root.left = deleteRec(root.left, key);
+        else if (key > root.key)
+            root.right = deleteRec(root.right, key);
+        else {
+            if (root.left == null)
+                return root.right;
+            else if (root.right == null)
+                return root.left;
+
+            root.key = minValue(root.right);
+
+            root.right = deleteRec(root.right, root.key);
+        }
+
+        return root;
+    }
+
+    int minValue(Node root) {
+      int minv = root.key;
+      while(root.left != null) {
+        minv = root.left.key;
+        root = root.left;
+      }
+      return minv;
+    }
+
+    boolean searchRec(Node root, int key) {
+      if(root == null)
+        return false;
+      if(root.key == key)
+        return true;
+      if(root.key < key)
+        return searchRec(root.right, key);
+      return searchRec(root.left, key);
+    }
+
+    void inorder() {
+      inorderRec(root);
+      System.out.println("\n");
+    }
+
+    void inorderRec(Node root) {
+      if(root != null) {
+        inorderRec(root.left);
+        System.out.print(root.key + " ");
+        inorderRec(root.right);
+      }
+    }
+
+    void preorder() {
+      preorderRec(root);
+      System.out.println("\n");
+    }
+
+    void preorderRec(Node root) {
+      if(root != null) {
+        System.out.print(root.key + " ");
+        preorderRec(root.left);
+      }
+    }
+
+    void postorder() {
+      postorderRec(root);
+      System.out.println("\n");
+    }
+
+    void postorderRec(Node root) {
+      if(root != null) {
+        postorderRec(root.left);
+        postorderRec(root.right);
+        System.out.println(root.key + " ");
+      }
+    }
+
+    public static ArrayList<Integer> path(Node node, ArrayList<Integer> pathA, int value) {
+      if(node == null)
+       return pathA;
+      
+      path.add(node.data);
+
+      int c = Integer.compare(value, node.data);
+
+      if(c < 0) {
+        path(node.left, path, value);
+      } else if( c > 0) {
+        path(node.right, path, value);
+      }
+      else {
+        return pathA;
+      }
+      return pathA;
+    }
+   }
