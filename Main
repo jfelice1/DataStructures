@@ -4,169 +4,316 @@ class Main {
     // Step 1 - Create a BST tree object called lab5Tree
      Lab5Tree tree = new Lab5Tree();
     // Step 2 - Insert the following values: 13, 22, 36, 5, 48, 17, 39, 2, 26, 40, 29, 34, 10
-     tree.insert(13);
-     tree.insert(22);
-     tree.insert(36);
-     tree.insert(5);
-     tree.insert(48);
-     tree.insert(17);
-     tree.insert(39);
-     tree.insert(2);
-     tree.insert(26);
-     tree.insert(40);
-     tree.insert(29);
-     tree.insert(34);
-     tree.insert(10);
+     insert(13);
+     insert(22);
+     insert(36);
+     insert(5);
+     insert(48);
+     insert(17);
+     insert(39);
+     insert(2);
+     insert(26);
+     insert(40);
+     insert(29);
+     insert(34);
+     insert(10);
     // Step 3 - Delete the value 17
-     tree.delete(17);
+     delete(17);
     // Step 4 - Traverse and output the values using inorder (sorted)
-     System.out.println("Inorder traversal: " + tree.inorder());
+     System.out.println("Inorder traversal: " + inorder());
     // Step 5 - Traverse and output the values using postorder
-     System.out.println("Postorder traversal: " + tree.postorder());
+     System.out.println("Postorder traversal: " + postorder());
     // Step 6 - Traverse and output the values using preorder
-     System.out.println("Preorder traversal: " + tree.preorder());
+     System.out.println("Preorder traversal: " + preorder());
     // Step 7 - Display the result of a search for the value 36
-    int searchKey = 36;
-    System.out.println("Search value 36: " + tree.search(searchKey));
+    System.out.println("Search value 36: " + search(36));
     // Step 8 - Display the result of a search for the value 37
-    int searchKey = 37;
-    System.out.println("Search value 37: " + tree.search(searchKey));
+    System.out.println("Search value 37: " + search(37));
     // Step 9 - Using the path() method, display the path from the root to 2
-    System.out.println("Path to 2: " + path(root, new ArrayList<Integer>(), 2));
+    System.out.println("Path to 2: " + path(2));
     // Step 10 - Display the path from the root to 34
-    System.out.println("Path to 34: " + path(root, new ArrayList<Integer>(), 34));
+    System.out.println("Path to 34: " + path(34));
   }
 }
 
-class Node {
-    int key;
-    Node left, right;
+public class BST<E> implements Tree<E> {
+  
+  protected TreeNode<E> root;
+  protected int size = 0;
+  protected java.util.Comparator<E> c; 
 
-    public Node(int item) {
-      key = item;
-      left = right = null;
-    }
-   }
-   class Lab5Tree {
-    Node root;
+  /** Create a default BST with a natural order comparator */
+  public BST() {
+    this.c = (e1, e2) -> ((Comparable<E>)e1).compareTo(e2);
+  }
 
-    public Lab5Tree() {
-      root = null;
-    }
-    
-    void insert(int key) {
-      root = insertRec(root, key);
-    }
+  /** Create a BST with a specified comparator */
+  public BST(java.util.Comparator<E> c) {
+    this.c = c;
+  }
 
-    Node insertRec(Node root, int key) {
-      if(root == null) {
-        root = new Node(key);
-        return root;
+  /** Create a binary tree from an array of objects */
+  public BST(E[] objects) {
+    this.c = (e1, e2) -> ((Comparable<E>)e1).compareTo(e2);
+    for (int i = 0; i < objects.length; i++)
+      add(objects[i]);
+  }
+
+  @Override /** Returns true if the element is in the tree */
+  public boolean search(E e) {
+    TreeNode<E> current = root; // Start from the root
+
+    while (current != null) {
+      if (c.compare(e, current.element) < 0) {
+        current = current.left;
       }
-      if(key < root.key) {
-        root.left = insertRec(root.left, key);
-      } 
-      else if(key > root.key) {
-        root.right = insertRec(root.right, key);
+      else if (c.compare(e, current.element) > 0) {
+        current = current.right;
       }
-      return root;
+      else // element matches current.element
+        return true; // Element is found
     }
 
-    void delete(int key) {
-      if (root == null)
-            return root;
+    return false;
+  }
 
-        if (key < root.key)
-            root.left = deleteRec(root.left, key);
-        else if (key > root.key)
-            root.right = deleteRec(root.right, key);
-        else {
-            if (root.left == null)
-                return root.right;
-            else if (root.right == null)
-                return root.left;
-
-            root.key = minValue(root.right);
-
-            root.right = deleteRec(root.right, root.key);
+  @Override /** Insert element e into the binary tree
+   * Return true if the element is inserted successfully */
+  public boolean insert(E e) {
+    if (root == null)
+      root = createNewNode(e); // Create a new root
+    else {
+      // Locate the parent node
+      TreeNode<E> parent = null;
+      TreeNode<E> current = root;
+      while (current != null)
+        if (c.compare(e, current.element) < 0) {
+          parent = current;
+          current = current.left;
         }
+        else if (c.compare(e, current.element) > 0) {
+          parent = current;
+          current = current.right;
+        }
+        else
+          return false; // Duplicate node not inserted
 
-        return root;
+      // Create the new node and attach it to the parent node
+      if (c.compare(e, parent.element) < 0)
+        parent.left = createNewNode(e);
+      else
+        parent.right = createNewNode(e);
     }
 
-    int minValue(Node root) {
-      int minv = root.key;
-      while(root.left != null) {
-        minv = root.left.key;
-        root = root.left;
+    size++;
+    return true; // Element inserted successfully
+  }
+
+  protected TreeNode<E> createNewNode(E e) {
+    return new TreeNode<>(e);
+  }
+
+  @Override /** Inorder traversal from the root */
+  public void inorder() {
+    inorder(root);
+  }
+
+  /** Inorder traversal from a subtree */
+  protected void inorder(TreeNode<E> root) {
+    if (root == null) return;
+    inorder(root.left);
+    System.out.print(root.element + " ");
+    inorder(root.right);
+  }
+
+  @Override /** Postorder traversal from the root */
+  public void postorder() {
+    postorder(root);
+  }
+
+  /** Postorder traversal from a subtree */
+  protected void postorder(TreeNode<E> root) {
+    if (root == null) return;
+    postorder(root.left);
+    postorder(root.right);
+    System.out.print(root.element + " ");
+  }
+
+  @Override /** Preorder traversal from the root */
+  public void preorder() {
+    preorder(root);
+  }
+
+  /** Preorder traversal from a subtree */
+  protected void preorder(TreeNode<E> root) {
+    if (root == null) return;
+    System.out.print(root.element + " ");
+    preorder(root.left);
+    preorder(root.right);
+  }
+
+  /** This inner class is static, because it does not access 
+      any instance members defined in its outer class */
+  public static class TreeNode<E> {
+    protected E element;
+    protected TreeNode<E> left;
+    protected TreeNode<E> right;
+
+    public TreeNode(E e) {
+      element = e;
+    }
+  }
+
+  @Override /** Get the number of nodes in the tree */
+  public int getSize() {
+    return size;
+  }
+
+  /** Returns the root of the tree */
+  public TreeNode<E> getRoot() {
+    return root;
+  }
+
+  /** Returns a path from the root leading to the specified element */
+  public java.util.ArrayList<TreeNode<E>> path(E e) {
+    java.util.ArrayList<TreeNode<E>> list =
+      new java.util.ArrayList<>();
+    TreeNode<E> current = root; // Start from the root
+
+    while (current != null) {
+      list.add(current); // Add the node to the list
+      if (c.compare(e, current.element) < 0) {
+        current = current.left;
       }
-      return minv;
-    }
-
-    boolean searchRec(Node root, int key) {
-      if(root == null)
-        return false;
-      if(root.key == key)
-        return true;
-      if(root.key < key)
-        return searchRec(root.right, key);
-      return searchRec(root.left, key);
-    }
-
-    void inorder() {
-      inorderRec(root);
-      System.out.println("\n");
-    }
-
-    void inorderRec(Node root) {
-      if(root != null) {
-        inorderRec(root.left);
-        System.out.print(root.key + " ");
-        inorderRec(root.right);
+      else if (c.compare(e, current.element) > 0) {
+        current = current.right;
       }
+      else
+        break;
     }
 
-    void preorder() {
-      preorderRec(root);
-      System.out.println("\n");
-    }
+    return list; // Return an array list of nodes
+  }
 
-    void preorderRec(Node root) {
-      if(root != null) {
-        System.out.print(root.key + " ");
-        preorderRec(root.left);
+  @Override /** Delete an element from the binary tree.
+   * Return true if the element is deleted successfully
+   * Return false if the element is not in the tree */
+  public boolean delete(E e) {
+    // Locate the node to be deleted and also locate its parent node
+    TreeNode<E> parent = null;
+    TreeNode<E> current = root;
+    while (current != null) {
+      if (c.compare(e, current.element) < 0) {
+        parent = current;
+        current = current.left;
       }
-    }
-
-    void postorder() {
-      postorderRec(root);
-      System.out.println("\n");
-    }
-
-    void postorderRec(Node root) {
-      if(root != null) {
-        postorderRec(root.left);
-        postorderRec(root.right);
-        System.out.println(root.key + " ");
+      else if (c.compare(e, current.element) > 0) {
+        parent = current;
+        current = current.right;
       }
+      else
+        break; // Element is in the tree pointed at by current
     }
 
-    public static ArrayList<Integer> path(Node node, ArrayList<Integer> pathA, int value) {
-      if(node == null)
-       return pathA;
-      
-      path.add(node.data);
+    if (current == null)
+      return false; // Element is not in the tree
 
-      int c = Integer.compare(value, node.data);
-
-      if(c < 0) {
-        path(node.left, path, value);
-      } else if( c > 0) {
-        path(node.right, path, value);
+    // Case 1: current has no left child
+    if (current.left == null) {
+      // Connect the parent with the right child of the current node
+      if (parent == null) {
+        root = current.right;
       }
       else {
-        return pathA;
+        if (c.compare(e, parent.element) < 0)
+          parent.left = current.right;
+        else
+          parent.right = current.right;
       }
-      return pathA;
     }
-   }
+    else {
+      // Case 2: The current node has a left child
+      // Locate the rightmost node in the left subtree of
+      // the current node and also its parent
+      TreeNode<E> parentOfRightMost = current;
+      TreeNode<E> rightMost = current.left;
+
+      while (rightMost.right != null) {
+        parentOfRightMost = rightMost;
+        rightMost = rightMost.right; // Keep going to the right
+      }
+
+      // Replace the element in current by the element in rightMost
+      current.element = rightMost.element;
+
+      // Eliminate rightmost node
+      if (parentOfRightMost.right == rightMost)
+        parentOfRightMost.right = rightMost.left;
+      else
+        // Special case: parentOfRightMost == current
+        parentOfRightMost.left = rightMost.left;     
+    }
+
+    size--;
+    return true; // Element deleted successfully
+  }
+
+  @Override /** Obtain an iterator. Use inorder. */
+  public java.util.Iterator<E> iterator() {
+    return new InorderIterator();
+  }
+
+  // Inner class InorderIterator
+  private class InorderIterator implements java.util.Iterator<E> {
+    // Store the elements in a list
+    private java.util.ArrayList<E> list =
+      new java.util.ArrayList<>();
+    private int current = 0; // Point to the current element in list
+
+    public InorderIterator() {
+      inorder(); // Traverse binary tree and store elements in list
+    }
+
+    /** Inorder traversal from the root*/
+    private void inorder() {
+      inorder(root);
+    }
+
+    /** Inorder traversal from a subtree */
+    private void inorder(TreeNode<E> root) {
+      if (root == null) return;
+      inorder(root.left);
+      list.add(root.element);
+      inorder(root.right);
+    }
+
+    @Override /** More elements for traversing? */
+    public boolean hasNext() {
+      if (current < list.size())
+        return true;
+
+      return false;
+    }
+
+    @Override /** Get the current element and move to the next */
+    public E next() {
+      return list.get(current++);
+    }
+
+    @Override // Remove the element returned by the last next()
+    public void remove() {
+      if (current == 0) // next() has not been called yet
+        throw new IllegalStateException(); 
+
+      delete(list.get(--current)); 
+      list.clear(); // Clear the list
+      inorder(); // Rebuild the list
+    }
+  }
+
+  @Override /** Remove all elements from the tree */
+  public void clear() {
+    root = null;
+    size = 0;
+  }
+}
